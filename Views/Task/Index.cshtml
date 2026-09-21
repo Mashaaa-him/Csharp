@@ -4,6 +4,41 @@
     ViewData["Title"] = "Task Dashboard";
 }
 
+<style>
+
+    .table-custom {
+        color: var(--text-main) !important;
+        margin-bottom: 0;
+        transition: color 0.3s ease;
+    }
+    .table-custom th {
+        background-color: var(--table-header-bg) !important;
+        color: var(--text-muted) !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid var(--card-border) !important;
+        padding: 16px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .table-custom td {
+        padding: 16px;
+        border-bottom: 1px solid var(--card-border);
+        vertical-align: middle;
+        transition: border-bottom 0.3s ease;
+    }
+    .badge-category {
+        background: var(--badge-bg);
+        color: var(--badge-text);
+        border: 1px solid var(--card-border);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+</style>
+
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>📋 My Task Dashboard</h2>
