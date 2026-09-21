@@ -31,6 +31,7 @@
                         <th>Description</th>
                         <th>Category</th>
                         <th>Due Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -68,7 +69,7 @@
                                     <input type="hidden" name="id" value="@item.Id"/>
 
                                     @if (item.IsCompleted)
-                                    
+
                                     {
                                         <button type="submit" class="btn btn-sm btn-success" title="Click to mark pending tasks">
                                             Kazi Kwisha!
@@ -82,6 +83,19 @@
                                     }
                                 </form>
                             </td>
+                             
+                            <td>
+                                <!--Edit Button-->
+                                <a asp-controller="Task" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-info me-2">
+                                    Edit
+                                </a>
+                                <!-- Delete Button-->
+                                <form asp-controller="Task" asp-action="Delete" method="post" style="display:inline;"
+                                      onsubmit="return confirm('Are you sure you want to delete this task?');">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button type="submit" class="btn btn-sm btn-danger"> Delete </button>      
+                                </form>
+                            </td> 
                         </tr>
                     }
                 </tbody>

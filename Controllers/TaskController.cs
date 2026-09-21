@@ -33,6 +33,47 @@ namespace c.Controllers
             return View();
         }
 
+        //Update- edit the form
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var task = _context.TaskItems.Find(id);
+            if  (task == null)
+            {
+                return NotFound();
+            }
+            return View(task);
+        }
+
+        // Update -save modified changes
+        [HttpPost]
+        public IActionResult Edit(TaskItem updatedTask)
+        {
+            if (ModelState.IsValid)
+            {
+                updatedTask.DueDate = DateTime.SpecifyKind(updatedTask.DueDate, DateTimeKind.Utc);
+                // Tell the entity framework to track this modified object and push updates
+                _context.TaskItems.Update(updatedTask);
+                _context.SaveChanges();
+
+                return RedirectToAction("Index");
+            }
+            return View(updatedTask);
+        }
+
+        // Delete- remove the task from database
+        [HttpPost]
+        public IActionResult Delete(int id)
+        {
+            var task = _context.TaskItems.Find(id);
+            if (task != null)
+            {
+                _context.TaskItems.Remove(task);//removes the row from PostgreSQL
+                _context.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
+
         // POST: /Task/Create
         [HttpPost]
         public IActionResult Create(TaskItem task)

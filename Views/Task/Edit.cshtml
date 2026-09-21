@@ -1,0 +1,28 @@
+@model c.Models.TaskItem
+
+<h2>✏️ Edit Task</h2>
+
+<form asp-controller="Task" asp-action="Edit" method="post">
+    <!-- Hidden input tracks the Primary Key ID -->
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group mb-3">
+        <label asp-for="Title" class="form-label">Task Title</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Description" class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <!-- Maintain our background defaults inside hidden fields -->
+    <input type="hidden" asp-for="IsCompleted" />
+    <input type="hidden" asp-for="Category" />
+    <input type="hidden" asp-for="DueDate" />
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
