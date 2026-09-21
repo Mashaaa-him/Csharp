@@ -1,0 +1,44 @@
+@model c.Models.TaskItem
+
+<h2>Today's Task</h2>
+
+<form asp-controller="Task" asp-action="Create" method="post"> 
+    
+    <!-- Title Input -->
+    <div class="form-group mb-3">
+        <label asp-for="Title" class="form-label">Enter Today's Task</label>
+        <input asp-for="Title" class="form-control"/>
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <!-- Description Input -->
+    <div class="form-group mb-3">
+        <label asp-for="Description" class="form-label">What are we doing today?</label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <!-- Category Dropdown Selection -->
+    <div class="form-group mb-3">
+        <label asp-for="Category" class="form-label">Task Category</label>
+        <select asp-for="Category" class="form-control">
+            <option value="Personal">🏠 Personal</option>
+            <option value="Work">💼 Work</option>
+            <option value="Shopping">🛒 Shopping</option>
+            <option value="Health">💪 Health</option>
+        </select>
+        <span asp-validation-for="Category" class="text-danger"></span>
+    </div>
+
+    <!-- Due Date Selection -->
+    <div class="form-group mb-3">
+        <label asp-for="DueDate" class="form-label">When is it due?</label>
+        <!-- type="date" forces the browser to open a calendar pop-up -->
+        <input asp-for="DueDate" type="date" class="form-control" />
+        <span asp-validation-for="DueDate" class="text-danger"></span>
+    </div>
+
+    <br />
+ 
+    <button type="submit" class="btn btn-success">Complete task registration</button>
+</form>

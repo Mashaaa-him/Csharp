@@ -1,0 +1,91 @@
+@model IEnumerable<c.Models.TaskItem>
+
+@{
+    ViewData["Title"] = "Task Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>📋 My Task Dashboard</h2>
+        <!-- Link to navigate to your Task creation form -->
+        <a asp-controller="Task" asp-action="Create" class="btn btn-primary">
+            ➕ Add New Task
+        </a>
+    </div>
+
+    <!-- If there are no tasks in the database yet, show a friendly message -->
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center" role="alert">
+            You don't have any tasks saved yet! Click "Add New Task" above to get started.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Status</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Due Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <!-- Status Column with Badge Styling -->
+                            <td>
+                                @if (item.IsCompleted)
+                                {
+                                    <span class="badge bg-success">Done</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                }
+                            </td>
+
+                            <!-- Task Details -->
+                            <td><strong>@item.Title</strong></td>
+                            <td>@item.Description</td>
+                            
+                            <!-- Category Badge -->
+                            <td>
+                                <span class="badge bg-secondary">@item.Category</span>
+                            </td>
+
+                            <!-- Formatted Date Column -->
+                            <td>
+                                @item.DueDate.ToString("yyyy-MM-dd")
+                            </td>
+                            
+                            <td>
+                                <form asp-controller="Task" asp-action="ToggleComplete" method="post" style="display:inline;">
+                                    <input type="hidden" name="id" value="@item.Id"/>
+
+                                    @if (item.IsCompleted)
+                                    
+                                    {
+                                        <button type="submit" class="btn btn-sm btn-success" title="Click to mark pending tasks">
+                                            Kazi Kwisha!
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="submit" class="btn btn-sm btn-outline-warning text-dark" title="Click to mark complete">
+                                            Pending
+                                        </button>
+                                    }
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
