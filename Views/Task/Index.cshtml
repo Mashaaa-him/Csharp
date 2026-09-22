@@ -41,11 +41,42 @@
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>📋 My Task Dashboard</h2>
+        <h2> My Task Dashboard</h2>
         <!-- Link to navigate to your Task creation form -->
         <a asp-controller="Task" asp-action="Create" class="btn btn-primary">
-            ➕ Add New Task
+             Add a New Task
         </a>
+    </div>
+
+    <!-- CSV Alert Notification Blocks -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success border-0 mb-3" style="background: rgba(34, 197, 94, 0.1); color: #4ade80;">
+            @TempData["Success"]
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger border-0 mb-3" style="background: rgba(248, 113, 113, 0.1); color: #f87171;">
+            @TempData["Error"]
+        </div>
+    }
+
+    <!-- Premium CSV Upload Area -->
+    <div class="card glass-card p-4 mb-4">
+        <h5 class="fw-bold mb-2">Bulk Import Objectives</h5>
+        <p class="text-muted small mb-3">Upload a standard .csv file containing columns labeled <strong>Title</strong>, <strong>Description</strong>, and optionally <strong>Category</strong>.</p>
+
+        <form asp-controller="Task" asp-action="UploadCsv" method="post" enctype="multipart/form-data" class="row g-3 align-items-center">
+            <div class="col-sm-8">
+                <input type="file" name="csvFile" accept=".csv" class="form-control" style="background: rgba(15, 23, 42, 0.2); border: 1px solid var(--card-border); color: var(--text-main);"/>
+            </div>
+            <div class="col-sm-4">
+                <button type="submit" class="btn btn-outline-info w-100 fw-semibold px-4">
+                    Upload & Sync
+                </button>
+            </div>
+        </form>
     </div>
 
     <!-- If there are no tasks in the database yet, show a friendly message -->
@@ -66,45 +97,19 @@
                         <th>Description</th>
                         <th>Category</th>
                         <th>Due Date</th>
-                        <th>Actions</th>
+                        <th style="text-align: right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <!-- Status Column with Badge Styling -->
-                            <td>
-                                @if (item.IsCompleted)
-                                {
-                                    <span class="badge bg-success">Done</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-warning text-dark">Pending</span>
-                                }
-                            </td>
-
-                            <!-- Task Details -->
-                            <td><strong>@item.Title</strong></td>
-                            <td>@item.Description</td>
-                            
-                            <!-- Category Badge -->
-                            <td>
-                                <span class="badge bg-secondary">@item.Category</span>
-                            </td>
-
-                            <!-- Formatted Date Column -->
-                            <td>
-                                @item.DueDate.ToString("yyyy-MM-dd")
-                            </td>
-                            
+                            <!-- 1. STATUS COLUMN WITH TOGGLE FORM -->
                             <td>
                                 <form asp-controller="Task" asp-action="ToggleComplete" method="post" style="display:inline;">
                                     <input type="hidden" name="id" value="@item.Id"/>
 
                                     @if (item.IsCompleted)
-
                                     {
                                         <button type="submit" class="btn btn-sm btn-success" title="Click to mark pending tasks">
                                             Kazi Kwisha!
@@ -118,19 +123,44 @@
                                     }
                                 </form>
                             </td>
-                             
+
+                            <!-- 2. TITLE COLUMN -->
                             <td>
-                                <!--Edit Button-->
-                                <a asp-controller="Task" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-info me-2">
-                                    Edit
-                                </a>
-                                <!-- Delete Button-->
-                                <form asp-controller="Task" asp-action="Delete" method="post" style="display:inline;"
-                                      onsubmit="return confirm('Are you sure you want to delete this task?');">
-                                    <input type="hidden" name="id" value="@item.Id" />
-                                    <button type="submit" class="btn btn-sm btn-danger"> Delete </button>      
-                                </form>
-                            </td> 
+                                <span class="fw-semibold @(item.IsCompleted ? "text-decoration-line-through text-muted" : "text-white")">
+                                    @item.Title
+                                </span>
+                            </td>
+
+                            <!-- 3. DESCRIPTION COLUMN -->
+                            <td class="@(item.IsCompleted ? "text-muted" : "text-secondary")">
+                                @item.Description
+                            </td>
+                            
+                            <!-- 4. CATEGORY COLUMN -->
+                            <td>
+                                <span class="badge bg-secondary badge-category">@item.Category</span>
+                            </td>
+
+                            <!-- 5. DUE DATE COLUMN -->
+                            <td>
+                                @item.DueDate.ToString("yyyy-MM-dd")
+                            </td>
+                            
+                            <!-- 6. OPERATIONS COLUMN (EDIT / DELETE) -->
+                            <td style="text-align: right;">
+                                <div class="d-inline-flex gap-2">
+                                    <a asp-controller="Task" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-action-edit px-2.5 py-1.5">
+                                        Edit
+                                    </a>
+
+                                    <form asp-controller="Task" asp-action="Delete" method="post" onsubmit="return confirm('Are you sure you want to permanently clear this task?');" style="display:inline;">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-action-delete px-2.5 py-1.5">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                     }
                 </tbody>

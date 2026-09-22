@@ -1,6 +1,13 @@
+using System.IO;
+using System.Globalization;
+using CsvHelper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using CsvHelper.Configuration;
 using c.Models;
 using c.Data; // 1. Added this to find your ApplicationDbContext
+
+
 
 namespace c.Controllers
 {
@@ -16,6 +23,62 @@ namespace c.Controllers
             _context = context;
         }
 
+        [HttpPost]
+public IActionResult UploadCsv(IFormFile csvFile)
+{
+    if (csvFile == null || csvFile.Length == 0)
+    {
+        TempData["Error"] = "Please select a valid CSV file first.";
+        return RedirectToAction("Index");
+    }
+
+    try
+    {
+        // 1. Configure the parser to ignore capitalization mismatches in column headers
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            PrepareHeaderForMatch = args => args.Header.ToLower(), // "title" becomes "title", "Title" becomes "title"
+            HeaderValidated = null, // Silences errors if you have extra columns in your spreadsheet
+            MissingFieldFound = null
+        };
+
+        using (var reader = new StreamReader(csvFile.OpenReadStream()))
+        using (var csv = new CsvReader(reader, config))
+        {
+            var records = csv.GetRecords<TaskItem>().ToList();
+
+            foreach (var task in records)
+            {
+                // Ensure defaults are enforced
+                task.IsCompleted = false;
+                if (string.IsNullOrEmpty(task.Category)) task.Category = "Bulk Import";
+
+                // Intercept any date parsed from the CSV and force its Kind to UTC
+                if (task.DueDate == DateTime.MinValue)
+                {
+                    task.DueDate = DateTime.UtcNow.AddDays(1);
+                }
+                else
+                {
+                    // If a date was provided, force it to be timezone-aligned for PostgreSQL
+                    task.DueDate = DateTime.SpecifyKind(task.DueDate, DateTimeKind.Utc);
+                }
+
+                _context.TaskItems.Add(task);
+            }
+
+            _context.SaveChanges();
+            TempData["Success"] = $"Successfully imported {records.Count} tasks!";
+        }
+    }
+    catch (Exception ex)
+    {
+        // This will print the precise error message to your dashboard screen so we know exactly why it failed
+        TempData["Error"] = $"Import failed: {ex.Message}";
+    }
+
+    return RedirectToAction("Index");
+}
         // GET: /Task/Index
         // Displays your task dashboard dashboard list
         [HttpGet]
@@ -112,6 +175,7 @@ namespace c.Controllers
             return RedirectToAction("Index");
         }
 
+        
         // GET: /Task/Success
         [HttpGet]
         public IActionResult Success()
